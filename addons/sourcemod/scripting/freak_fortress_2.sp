@@ -7867,727 +7867,248 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 		}
 	}
 
-	if(!ConfigWeapons)
+	if((!ff2_attribute_manage.IntValue && tf2x10) || ff2_attribute_manage.IntValue==2)
 	{
-		// Nothin
-	}
-	else if(kvWeaponMods == null)
-	{
-		LogToFile(eLog, "[Weapons] Critical Error! Unable to configure weapons from '%s!", WeaponCFG);
+		return Plugin_Continue;
 	}
 	else
 	{
-		int wepIdx, wepIndex, weaponIdxcount, isOverride;
-		char weapon[64];
-		for(int i=1; ; i++)
-		{
-			KvRewind(kvWeaponMods);
-			FormatEx(weapon, sizeof(weapon), "weapon%i", i);
-			if(KvJumpToKey(kvWeaponMods, weapon))
-			{
-				static char wepIndexStr[768], attributes[768];
-				isOverride = KvGetNum(kvWeaponMods, "mode");
-				KvGetString(kvWeaponMods, "classname", weapon, sizeof(weapon));
-				KvGetString(kvWeaponMods, "index", wepIndexStr, sizeof(wepIndexStr));
-				KvGetString(kvWeaponMods, "attributes", attributes, sizeof(attributes));
-
-				if(isOverride)
-				{
-					if(StrContains(wepIndexStr, "-2")!=-1 && StrContains(classname, weapon, false)!=-1 || StrContains(wepIndexStr, "-1")!=-1 && StrEqual(classname, weapon, false))
-					{
-						if(isOverride != 3)
-						{
-							Handle itemOverride = PrepareItemHandle(item, _, _, attributes, isOverride!=1);
-							if(itemOverride != null)
-							{
-								item = itemOverride;
-								return Plugin_Changed;
-							}
-						}
-						else
-						{
-							return Plugin_Stop;
-						}
-					}
-
-					if(StrContains(wepIndexStr, "-1")==-1 && StrContains(wepIndexStr, "-2")==-1)
-					{
-						static char wepIndexes[768][32];
-						weaponIdxcount = ExplodeString(wepIndexStr, " ; ", wepIndexes, sizeof(wepIndexes), 32);
-						for(wepIdx=0; wepIdx<=weaponIdxcount; wepIdx++)
-						{
-							if(!wepIndexes[wepIdx][0])
-								continue;
-
-							wepIndex = StringToInt(wepIndexes[wepIdx]);
-							if(wepIndex != iItemDefinitionIndex)
-								continue;
-
-							switch(isOverride)
-							{
-								case 3:
-								{
-									return Plugin_Stop;
-								}
-								case 2, 1:
-								{
-									Handle itemOverride = PrepareItemHandle(item, _, _, attributes, isOverride!=1);
-									if(itemOverride != null)
-									{
-										item = itemOverride;
-										return Plugin_Changed;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			else
-			{
-				break;
-			}
-		}
-		KvGoBack(kvWeaponMods);
-	}
-
-	if(cvarHardcodeWep.IntValue > 0)
-	{
 		switch(iItemDefinitionIndex)
 		{
-			case 39, 1081:  //Flaregun
+		case 38, 457:  //Axtinguisher, Postal Pummeler
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "6 ; 0.67");
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "", true);
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 40, 1146:  //Backburner, Festive Backburner
+		case 39, 351, 1081:  //Flaregun, Detonator, Festive Flaregun
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "170 ; 1.5");
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "25 ; 0.5 ; 58 ; 3.2 ; 144 ; 1.0 ; 207 ; 1.33", true);
+				//25: -50% ammo
+				//58: 220% self damage force
+				//144: NOPE
+				//207: +33% damage to self
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 41:  //Natascha
+		case 40, 1146:  //Backburner, Festive Backburner
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "32 ; 0 ; 75 ; 1.34");
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "165 ; 1.0");
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 43:  //Killing Gloves of Boxing
+		case 224:  //L'etranger
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "16 ; 50 ; 69 ; 0.2 ; 77 ; 0 ; 109 ; 0.5 ; 177 ; 2 ; 205 ; 0.7 ; 206 ; 0.7 ; 239 ; 0.6 ; 442 ; 1.35 ; 443 ; 1.1 ; 800 ; 0");
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "85 ; 0.5 ; 157 ; 1.0 ; 253 ; 1.0");
+				//85: +50% time needed to regen cloak
+				//157: +1 second needed to fully disguise
+				//253: +1 second needed to fully cloak
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 44:  //Sandman
+		case 239, 1084, 1100:  //GRU, Festive GRU, Bread Bite
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "773 ; 1.15");
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "1 ; 0.5 ; 107 ; 1.5 ; 128 ; 1 ; 191 ; -7 ; 772 ; 1.5", true);
+				//1: -50% damage
+				//107: +50% move speed
+				//128: Only when weapon is active
+				//191: -7 health/second
+				//772: Holsters 50% slower
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 56, 1005, 1092:  //Huntsman, Festive Huntsman, Fortified Compound
+		case 56, 1005, 1092:  //Huntsman, Festive Huntsman, Fortified Compound
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "76 ; 2");
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "2 ; 1.5 ; 76 ; 2");
+				//2: +50% damage
+				//76: +100% ammo
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 57:  //Razorback
+		case 226:  //Battalion's Backup
 			{
-				if(cvarShieldType.IntValue > 1)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "140 ; 10.0");
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					Handle itemOverride = PrepareItemHandle(item, _, _, _, true);
-					if(itemOverride != INVALID_HANDLE)
-					{
-						item = itemOverride;
-						return Plugin_Changed;
-					}
-				}
-			}
-			case 127:  //Direct Hit
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "179 ; 1.0");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 128:  //Equalizer
+		case 231:  //Darwin's Danger Shield
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "740 ; 0 ; 239 ; 0.5");
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "26 ; 50");  //+50 health
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 129:  //Buff Banner
+		case 305, 1079:  //Crusader's Crossbow, Festive Crusader's Crossbow
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "319 ; 1.5");
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "2 ; 1.2 ; 17 ; 0.15");
+				//2: +20% damage
+				//17: +15% uber on hit
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 131, 1144:  //Chargin' Targe
+		case 331:  //Fists of Steel
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "396 ; 0.95", true);
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "205 ; 0.8 ; 206 ; 2.0 ; 772 ; 2.0", true);
+				//205: -80% damage from ranged while active
+				//206: +100% damage from melee while active
+				//772: Holsters 100% slower
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 140, 1086, 30668:  //Wrangler
+		case 415:  //Reserve Shooter
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "54 ; 0.75 ; 128 ; 1 ; 206 ; 1.5");
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "2 ; 1.1 ; 3 ; 0.5 ; 114 ; 1 ; 179 ; 1 ; 547 ; 0.6", true);
+				//2: +10% damage bonus
+				//3: -50% clip size
+				//114: Mini-crits targets launched airborne by explosions, grapple hooks or enemy attacks
+				//179: Minicrits become crits
+				//547: Deploys 40% faster
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 153, 466:  //Homewrecker
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "394 ; 3 ; 215 ; 10 ; 522 ; 1 ; 216 ; 10");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 154:  //Pain Train
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "20 ; 1 ; 149 ; 6 ; 204 ; 1 ; 408 ; 1", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 155:  //Southern Hospitality
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "1 ; 0.6 ; 20 ; 1 ; 61 ; 1 ; 408 ; 1");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 171:  //Tribalman's Shiv
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "20 ; 1 ; 408 ; 1");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 173:  //Vita-Saw
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "125 ; -10 ; 17 ; 0.15 ; 737 ; 1.25", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 220:  //Shortstop
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "868 ; 1");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 224:  //L'etranger
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "166 ; 5");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 231:  //Darwin's Danger Shield
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "26 ; 85 ; 800 ; 0.19 ; 69 ; 0.6 ; 109 ; 0.6", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 232:  //Bushwacka
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "58 ; 1.35");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 237:  //Rocket Jumper
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "1 ; 0.3 ; 15 ; 0 ; 135 ; 0.5 ; 206 ; 2 ; 400 ; 1", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 239, 1084, 1100:  //GRU, Festive GRU, Bread Bite
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "1 ; 0.5 ; 107 ; 1.5 ; 128 ; 1 ; 191 ; -7 ; 772 ; 1.5", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 265:  //Sticky Jumper
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "1 ; 0.3 ; 15 ; 0 ; 89 ; -6 ; 135 ; 0.5 ; 206 ; 2 ; 280 ; 14 ; 400 ; 1", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 305, 1079:  //Crusader's Crossbow, Festive Crusader's Crossbow
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "17 ; 0.2");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 312:  //Brass Beast
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "206 ; 1.35");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 317:  //Candy Cane
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "740 ; 0.5 ; 239 ; 0.75", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 325, 452, 812, 833:  //Boston Basher, Three-Rune Blade, Flying Guillotine(s)
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "20 ; 1 ; 138 ; 0.67 ; 408 ; 1");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 327:  //Claidheamh Mor
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "412 ; 1.2");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 329:  //Jag
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "92 ; 1.3 ; 6 ; 0.85 ; 95 ; 0.6 ; 1 ; 0.5 ; 137 ; 1.34", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 331:  //Fists of Steel
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "205 ; 0.65 ; 206 ; 0.65 ; 772 ; 2.0 ; 800 ; 0.6 ; 854 ; 0.6", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 348:  //Sharpened Volcano Fragment
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "16 ; 30 ; 69 ; 0.34 ; 77 ; 0 ; 109 ; 0.5 ; 773 ; 1.5 ; 205 ; 0.8 ; 206 ; 0.6 ; 239 ; 0.67 ; 442 ; 1.15 ; 443 ; 1.15 ; 800 ; 0.34");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 349:  //Sun-on-a-Stick
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "1 ; 0.75 ; 795 ; 2", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 351:  //Detonator
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "25 ; 0.5 ; 58 ; 3.2 ; 79 ; 0.75 ; 144 ; 1.0 ; 207 ; 1.33", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 355:  //Fan O'War
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "1 ; 0.25 ; 6 ; 0.5 ; 49 ; 1 ; 137 ; 4 ; 107 ; 1.1 ; 201 ; 1.1 ; 77 ; 0.38", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 404:  //Persian Persuader
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "772 ; 1.15 ; 249 ; 0.6 ; 781 ; 1 ; 778 ; 0.5 ; 782 ; 1", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 405, 608:  //Ali Baba's Wee Booties, Bootlegger
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "26 ; 25 ; 246 ; 3 ; 107 ; 1.10", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 406:  //Splendid Screen
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "248 ; 2.6", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 414:  //Liberty Launcher
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "1 ; 0.65 ; 206 ; 1.5");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 415:  //Reserve Shooter
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "2 ; 1.1 ; 3 ; 0.5 ; 114 ; 1 ; 179 ; 1 ; 547 ; 0.6", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 416:  //Market Gardener
-			{
-				Handle itemOverride;
-				if(cvarMarket.FloatValue)
-				{
-					itemOverride = PrepareItemHandle(item, _, _, "5 ; 2");
-				}
-				else
-				{
-					itemOverride = PrepareItemHandle(item, _, _, "", true);
-				}
-
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 426:  //Eviction Notice
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "1 ; 0.2 ; 6 ; 0.25 ; 107 ; 1.2 ; 737 ; 2.25", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 441:  //Cow Mangler
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "71 ; 2.5");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 444:  //Mantreads
+		case 444:  //Mantreads
 			{
 				#if defined _tf2attributes_included
 				if(tf2attributes)
 				{
 					TF2Attrib_SetByDefIndex(client, 58, 1.5);
 				}
-				else
-				{
-					Handle itemOverride = PrepareItemHandle(item, _, _, "58 ; 1.5");
-					if(itemOverride != INVALID_HANDLE)
-					{
-						item = itemOverride;
-						return Plugin_Changed;
-					}
-				}
-				#else
-				Handle itemOverride = PrepareItemHandle(item, _, _, "58 ; 1.5");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
 				#endif
 			}
-			case 442, 588:  //Bison, Pomson
+		case 648:  //Wrap Assassin
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "182 ; 2");
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "279 ; 2.0");
+				//279: 2 ornaments
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 528:  //Short Circuit
+		case 656:  //Holiday Punch
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "20 ; 1 ; 182 ; 2 ; 408 ; 1");
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "199 ; 0 ; 547 ; 0 ; 358 ; 0 ; 362 ; 0 ; 363 ; 0 ; 369 ; 0", true);
+				//199: Holsters 100% faster
+				//547: Deploys 100% faster
+				//Other attributes: Because TF2Items doesn't feel like stripping the Holiday Punch's attributes for some reason
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 589:  //Eureka Effect
+		case 772:  //Baby Face's Blaster
 			{
-				if(!cvarEnableEurekaEffect.BoolValue)  //Disabled
+				Handle itemOverride=PrepareItemHandle(item, _, _, "2 ; 1.25 ; 109 ; 0.5 ; 125 ; -25 ; 394 ; 0.85 ; 418 ; 1 ; 419 ; 100 ; 532 ; 0.5 ; 651 ; 0.5 ; 709 ; 1", true);
+				//2: +25% damage bonus
+				//109: -50% health from packs on wearer
+				//125: -25 max health
+				//394: 15% firing speed bonus hidden
+				//418: Build hype for faster speed
+				//419: Hype resets on jump
+				//532: Hype decays
+				//651: Fire rate increases as health decreases
+				//709: Weapon spread increases as health decreases
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					Handle itemOverride = PrepareItemHandle(item, _, _, "93 ; 0.75 ; 276 ; 1 ; 790 ; 0.5 ; 732 ; 0.9", true);
-					if(itemOverride != INVALID_HANDLE)
-					{
-						item = itemOverride;
-						return Plugin_Changed;
-					}
-				}
-			}
-			case 593:  //Third Degree
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "853 ; 0.8 ; 854 ; 0.8");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 595:  //Manmelter
+		case 1103:  //Back Scatter
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "6 ; 0.35");
-				if(itemOverride != INVALID_HANDLE)
+				Handle itemOverride=PrepareItemHandle(item, _, _, "179 ; 1");
+				//179: Crit instead of mini-critting
+				if(itemOverride!=INVALID_HANDLE)
 				{
-					item = itemOverride;
+					item=itemOverride;
 					return Plugin_Changed;
 				}
 			}
-			case 648:  //Wrap Assassin
+		}
+		
+
+		if(TF2_GetPlayerClass(client)==TFClass_Soldier && (!StrContains(classname, "tf_weapon_rocketlauncher", false) || !StrContains(classname, "tf_weapon_shotgun", false)))
+		{
+			Handle itemOverride;
+			if(iItemDefinitionIndex==127)  //Direct Hit
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "1 ; 0.53 ; 20 ; 1 ; 138 ; 0.67 ; 408 ; 1");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
+				itemOverride=PrepareItemHandle(item, _, _, "114 ; 1 ; 179 ; 1.0");
+				//114: Mini-crits targets launched airborne by explosions, grapple hooks or enemy attacks
+				//179: Mini-crits become crits
 			}
-			case 656:  //Holiday Punch
+			else
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "178 ; 0.001", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
+				itemOverride=PrepareItemHandle(item, _, _, "114 ; 1");
+				//114: Mini-crits targets launched airborne by explosions, grapple hooks or enemy attacks
 			}
-			case 730:  //Beggar's Bazooka
+
+			if(itemOverride!=INVALID_HANDLE)
 			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "76 ; 1.5");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 740:  //Scorch Shot
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "79 ; 0.75");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 772:  //Baby Face's Blaster
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "532 ; 1.2");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 775:  //Escape Plan
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "740 ; 0 ; 206 ; 1.5 ; 239 ; 0.5");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 811, 832:  //Huo-Long Heater
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "71 ; 2.75");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 813, 834:  //Neon Annihilator
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "182 ; 2");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 1099:  //Tide Turner
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "639 ; 50", true);
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 1103:  //Back Scatter
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "179 ; 1");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 1104:  //Air Strike
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "1 ; 0.82 ; 206 ; 1.25");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 1179:  //Thermal Thruster
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "872 ; 1");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 1180:  //Gas Passer
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "875 ; 1 ; 2059 ; 3000");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
-			}
-			case 1181:  //Hot Hand
-			{
-				Handle itemOverride = PrepareItemHandle(item, _, _, "877 ; 2");
-				if(itemOverride != INVALID_HANDLE)
-				{
-					item = itemOverride;
-					return Plugin_Changed;
-				}
+				item=itemOverride;
+				return Plugin_Changed;
 			}
 		}
 
 		if(!StrContains(classname, "tf_weapon_syringegun_medic"))  //Syringe guns
 		{
-			Handle itemOverride = PrepareItemHandle(item, _, _, "17 ; 0.05");
-			if(itemOverride != INVALID_HANDLE)
+			Handle itemOverride=PrepareItemHandle(item, _, _, "17 ; 0.05 ; 144 ; 1", true);
+			//17: 5% uber on hit
+			//144: Sets weapon mode - *possibly* the overdose speed effect
+			if(itemOverride!=INVALID_HANDLE)
 			{
-				item = itemOverride;
+				item=itemOverride;
 				return Plugin_Changed;
 			}
 		}
-		else if(!StrContains(classname, "tf_weapon_medigun"))  //Medi Gun
+		else if(!StrContains(classname, "tf_weapon_medigun"))  //Mediguns
 		{
-			Handle itemOverride;
-			switch(iItemDefinitionIndex)
+			Handle itemOverride=PrepareItemHandle(item, _, _, "10 ; 1.75 ; 11 ; 1.5 ; 144 ; 2.0 ; 199 ; 0.75 ; 314 ; 4 ; 547 ; 0.75", true);
+			//10: +75% faster charge rate
+			//11: +50% overheal bonus
+			//144: Quick-fix speed/jump effects
+			//199: Deploys 25% faster
+			//314: Ubercharge lasts 4 seconds longer (aka 50% longer)
+			//547: Holsters 25% faster
+			if(itemOverride!=INVALID_HANDLE)
 			{
-				case 35:
-					itemOverride = PrepareItemHandle(item, _, _, "10 ; 2.25 ; 11 ; 1.5 ; 18 ; 1 ; 199 ; 0.75 ; 314 ; 3 ; 547 ; 0.75");
-
-				case 411:  //Quick-Fix
-					itemOverride = PrepareItemHandle(item, _, _, "8 ; 1.0 ; 10 ; 2 ; 105 ; 1 ; 144 ; 2 ; 199 ; 0.75 ; 231 ; 2 ; 493 ; 2 ; 547 ; 0.75");
-
-				case 998:  //Vaccinator
-					itemOverride = PrepareItemHandle(item, _, _, "10 ; 2.5 ; 11 ; 1.5 ; 199 ; 0.75 ; 314 ; -3 ; 479 ; 0.34 ; 499 ; 1 ; 547 ; 0.75 ; 739 ; 0.34", true);
-
-				default:
-					itemOverride = PrepareItemHandle(item, _, _, "10 ; 1.75 ; 11 ; 1.5 ; 144 ; 2.0 ; 199 ; 0.75 ; 547 ; 0.75");
-			}
-
-			if(itemOverride != INVALID_HANDLE)
-			{
-				item = itemOverride;
+				item=itemOverride;
 				return Plugin_Changed;
 			}
 		}
+		
 	}
 	return Plugin_Continue;
 }
