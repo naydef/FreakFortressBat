@@ -80,7 +80,7 @@ last time or to encourage others to do the same.
 //#define FORK_DEV_REVISION "development"
 #define FORK_DATE_REVISION "February 22, 2020"
 
-#define BUILD_NUMBER FORK_MINOR_REVISION...""...FORK_STABLE_REVISION..."003"
+#define BUILD_NUMBER FORK_MINOR_REVISION...""...FORK_STABLE_REVISION..."002"
 
 #if !defined FORK_DEV_REVISION
 	#define PLUGIN_VERSION FORK_SUB_REVISION..." "...FORK_MAJOR_REVISION..."."...FORK_MINOR_REVISION..."."...FORK_STABLE_REVISION
@@ -6929,7 +6929,7 @@ void EquipBoss(int boss)
 			}
 			else
 			{
-				SetEntProp(weapon, Prop_Send, "m_nModelIndexOverrides", -1, _, 0);
+				SetEntPropFloat(weapon, Prop_Send, "m_flModelScale", 0.001);
 			}
 
 			SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
@@ -9031,12 +9031,12 @@ public void OnUberDeployed(Event event, const char[] name, bool dontBroadcast)
 	if(!StrEqual(classname, "tf_weapon_medigun"))
 		return;
 
-	//TF2_AddCondition(client, TFCond_UberchargedCanteen, 0.5);
+	TF2_AddCondition(client, TFCond_UberchargedCanteen, 0.5);
 	TF2_AddCondition(client, TFCond_HalloweenCritCandy, 0.5, client);
 	int target = GetHealingTarget(client);
 	if(IsValidClient(target, false) && IsPlayerAlive(target))
 	{
-		//TF2_AddCondition(client, TFCond_UberchargedCanteen, 0.5);
+		TF2_AddCondition(client, TFCond_UberchargedCanteen, 0.5);
 		TF2_AddCondition(target, TFCond_HalloweenCritCandy, 0.5, client);
 		uberTarget[client] = target;
 	}
@@ -9059,11 +9059,11 @@ public Action Timer_Uber(Handle timer, any medigunid)
 			int target = GetHealingTarget(client);
 			if(charge > 0.05)
 			{
-				//TF2_AddCondition(client, TFCond_UberchargedCanteen, 0.5);
+				TF2_AddCondition(client, TFCond_UberchargedCanteen, 0.5);
 				TF2_AddCondition(client, TFCond_HalloweenCritCandy, 0.5);
 				if(IsValidClient(target, false) && IsPlayerAlive(target))
 				{
-					//TF2_AddCondition(client, TFCond_UberchargedCanteen, 0.5);
+					TF2_AddCondition(client, TFCond_UberchargedCanteen, 0.5);
 					TF2_AddCondition(target, TFCond_HalloweenCritCandy, 0.5);
 					uberTarget[client] = target;
 				}
@@ -10219,7 +10219,7 @@ public Action ClientTimer(Handle timer)
 			SetHudTextParams(-1.0, 0.83, 0.15, 255, 255, 255, 255, 0);
 			ShowSyncHudText(client, jumpHUD, "%t", "Sapper Cooldown", SapperAmount);
 		}
-		else if(shield[client] && (cvarShieldType.IntValue==3 || cvarShieldType.IntValue==4))
+		else if((class==TFClass_Sniper || class==TFClass_DemoMan) && (cvarShieldType.IntValue==3 || cvarShieldType.IntValue==4))
 		{
 			SetHudTextParams(-1.0, 0.83, 0.15, 255, 255, 255, 255, 0);
 			ShowSyncHudText(client, jumpHUD, "%t", "Shield HP", RoundToFloor(shieldHP[client]/cvarShieldHealth.FloatValue*100.0));
@@ -12082,7 +12082,7 @@ public Action OnPlayerHurt(Event event, const char[] name, bool dontBroadcast)
 			}
 			case 3:
 			{
-				if(GetPlayerWeaponSlot(attacker, TFWeaponSlot_Melee)!=weapon && shieldHP[client]>0 && damage<preHealth)
+				if(GetPlayerWeaponSlot(attacker, TFWeaponSlot_Melee)!=weapon && shieldHP[client]>=0.0 && damage<preHealth)
 				{
 					int damageresist = RoundFloat(float(damage)*shDmgReduction[client]);
 
@@ -12092,7 +12092,7 @@ public Action OnPlayerHurt(Event event, const char[] name, bool dontBroadcast)
 
 					shDmgReduction[client] = shieldHP[client]/cvarShieldHealth.FloatValue*(1.0-cvarShieldResist.FloatValue);
 
-					if(shieldHP[client] > 0)
+					if(shieldHP[client] > 0.0)
 					{
 						char ric[PLATFORM_MAX_PATH];
 						FormatEx(ric, sizeof(ric), "weapons/fx/rics/ric%i.wav", GetRandomInt(1,5));
