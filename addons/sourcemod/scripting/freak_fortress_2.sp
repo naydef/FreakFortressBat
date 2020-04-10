@@ -11254,8 +11254,14 @@ void ActivateAbilitySlot(int boss, int slot, bool buttonmodeactive=false)
 			{
 				KvGetString(BossKV[Special[boss]], "plugin_name", pluginName, sizeof(pluginName));
 				KvGetString(BossKV[Special[boss]], "name", abilityName, sizeof(abilityName));
+				int orig_boss_team = BossTeam;
+				BossTeam = GetClientTeam(Boss[boss]);
 				if(!UseAbility(abilityName, pluginName, boss, slot, buttonmode))
+				{
+					BossTeam = orig_boss_team;
 					return;
+				}
+				BossTeam = orig_boss_team;
 			}
 			else
 			{
@@ -11266,9 +11272,14 @@ void ActivateAbilitySlot(int boss, int slot, bool buttonmodeactive=false)
 					{
 						KvGetString(BossKV[Special[boss]], "plugin_name", pluginName, sizeof(pluginName));
 						KvGetString(BossKV[Special[boss]], "name", abilityName, sizeof(abilityName));
+						int orig_boss_team = BossTeam;
+						BossTeam = GetClientTeam(Boss[boss]);
 						if(!UseAbility(abilityName, pluginName, boss, slot, buttonmode))
+						{
+							BossTeam = orig_boss_team;
 							return;
-
+						}
+						BossTeam = orig_boss_team;
 						break;
 					}
 				}
@@ -17459,6 +17470,9 @@ public int Native_DoAbility(Handle plugin, int numParams)
 	static char ability_name[64];
 	GetNativeString(2, plugin_name, sizeof(plugin_name));
 	GetNativeString(3, ability_name, sizeof(ability_name));
+	int orig_boss_team = BossTeam;
+	BossTeam = GetClientTeam(Boss[GetNativeCell(1)]);
+	BossTeam = orig_boss_team;
 	UseAbility(ability_name, plugin_name, GetNativeCell(1), GetNativeCell(4), GetNativeCell(5));
 }
 
