@@ -9745,7 +9745,7 @@ public Action ClientTimer(Handle timer)
 		else if(HudSettings[client][1] || (FF2flags[client] & FF2FLAG_HUDDISABLED) || (buttons & IN_SCORE))
 		{
 		}
-		else if(SapperEnabled && SapperCooldown[client]>0.0)
+		else if(SapperEnabled && SapperCooldown[client]>0.0 && TF2_GetPlayerClass(client)==TFClass_Spy)
 		{
 			SapperAmount = RoundToFloor((SapperCooldown[client]-cvarSapperCooldown.FloatValue)*(Pow(cvarSapperCooldown.FloatValue, -1.0)*-100.0));
 			if(SapperAmount < 0)
