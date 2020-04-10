@@ -7870,7 +7870,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 		}
 	}
 
-	if((!ff2_attribute_manage.IntValue && tf2x10) || ff2_attribute_manage.IntValue==2)
+	if((!ff2_attribute_manage.IntValue && TimesTen) || ff2_attribute_manage.IntValue==2)
 	{
 		return Plugin_Continue;
 	}
@@ -8426,49 +8426,16 @@ public Action Timer_CheckItems(Handle timer, any userid)
 	{
 		index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
 		GetEntityClassname(weapon, classname, sizeof(classname));
-		if(kvWeaponMods!=null && ConfigWeapons)
+		switch(index)
 		{
-			for(int i=1; ; i++)
+		case 589:  //Eureka Effect
 			{
-				KvRewind(kvWeaponMods);
-				FormatEx(format, 10, "weapon%i", i);
-				if(KvJumpToKey(kvWeaponMods, format))
+				if(!GetConVarBool(cvarEnableEurekaEffect))
 				{
-					KvGetString(kvWeaponMods, "classname", format, sizeof(format));
-					KvGetString(kvWeaponMods, "index", wepIndexStr, sizeof(wepIndexStr));
-					slot = KvGetNum(kvWeaponMods, "slot", -1);
-					if(slot<0 || slot>2)
-						slot = 2;
-
-					if(StrContains(wepIndexStr, "-2")!=-1 && StrContains(classname, format, false)!=-1 || StrContains(wepIndexStr, "-1")!=-1 && StrEqual(classname, format, false))
-					{
-						CritBoosted[client][slot] = KvGetNum(kvWeaponMods, "crits", -1);
-						break;
-					}
-
-					if(StrContains(wepIndexStr, "-1")==-1 && StrContains(wepIndexStr, "-2")==-1)
-					{
-						weaponIdxcount = ExplodeString(wepIndexStr, " ; ", wepIndexes, sizeof(wepIndexes), 32);
-						for(wepIdx=0; wepIdx<=weaponIdxcount ; wepIdx++)
-						{
-							if(!wepIndexes[wepIdx][0])
-								continue;
-
-							wepIndex = StringToInt(wepIndexes[wepIdx]);
-							if(wepIndex != index)
-								continue;
-
-							CritBoosted[client][slot] = KvGetNum(kvWeaponMods, "crits", -1);
-							break;
-						}
-					}
-				}
-				else
-				{
-					break;
+					TF2_RemoveWeaponSlot(client, TFWeaponSlot_Melee);
+					FF2_SpawnWeapon(client, "tf_weapon_wrench", 7, 1, 0, "");
 				}
 			}
-			KvGoBack(kvWeaponMods);
 		}
 	}
 	else
