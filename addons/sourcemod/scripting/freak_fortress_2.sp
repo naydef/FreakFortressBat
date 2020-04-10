@@ -342,6 +342,7 @@ ConVar cvarHealth;
 ConVar cvarRageDamage;
 ConVar cvarDifficulty;
 ConVar ff2_fix_boss_skin;
+ConVar ff2_backstab;
 
 Handle FF2Cookies;
 Handle StatCookies;
@@ -830,6 +831,7 @@ public void OnPluginStart()
 	cvarRageDamage = CreateConVar("ff2_rage_formula", "1900.0", "Default boss ragedamage formula");
 	cvarDifficulty = CreateConVar("ff2_difficulty_random", "0.0", "0-Players can set their difficulty, #-Chance of difficulty", _, true, 0.0, true, 100.0);
 	ff2_fix_boss_skin=CreateConVar("ff2_fix_boss_skin", "1", "Make FF2 remove wearables in a new way(fixes certain buggy models having bad skin)? 0 - No, 1 - Yes", _, true, 0.0, true, 1.0);
+	ff2_backstab=CreateConVar("ff2_backstab", "1.0", "#-Damage ratio of backstabs. Note: values equal or less than 0 are forbidden", _, true, 0.01);
 
 	//The following are used in various subplugins
 	CreateConVar("ff2_oldjump", "1", "Use old Saxton Hale jump equations", _, true, 0.0, true, 1.0);
@@ -12543,6 +12545,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 				{
 					damage = BossHealthMax[boss]*(LastBossIndex()+1)*BossLivesMax[boss]*(0.12-Stabbed[boss]/90)/5;
 				}
+				damage *= ff2_backstab.FloatValue;
 				damagetype |= DMG_CRIT|DMG_PREVENT_PHYSICS_FORCE;
 				damagecustom = 0;
 
