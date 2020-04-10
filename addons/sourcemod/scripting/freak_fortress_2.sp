@@ -944,6 +944,7 @@ public void OnPluginStart()
 	RegConsoleCmd("ff2hud", Command_HudMenu, "Toggle specific HUD settings");
 	RegConsoleCmd("ff2_dmg", Command_HudMenu, "Toggle specific HUD settings");
 	RegConsoleCmd("ff2dmg", Command_HudMenu, "Toggle specific HUD settings");
+	RegConsoleCmd("ff2difficulty", DiffMenu, "Open Difficulty menu");
 
 	RegConsoleCmd("hale", FF2Panel, "Menu of FF2 commands");
 	RegConsoleCmd("hale_hp", Command_GetHPCmd, "View the boss's current HP");
