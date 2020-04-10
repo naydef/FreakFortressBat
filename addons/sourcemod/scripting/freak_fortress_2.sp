@@ -341,6 +341,7 @@ ConVar cvarTelefrag;
 ConVar cvarHealth;
 ConVar cvarRageDamage;
 ConVar cvarDifficulty;
+ConVar ff2_fix_boss_skin;
 
 Handle FF2Cookies;
 Handle StatCookies;
@@ -828,6 +829,7 @@ public void OnPluginStart()
 	cvarHealth = CreateConVar("ff2_health_formula", "(((760.8+n)*(n-1))^1.0341)+2046", "Default boss health formula");
 	cvarRageDamage = CreateConVar("ff2_rage_formula", "1900.0", "Default boss ragedamage formula");
 	cvarDifficulty = CreateConVar("ff2_difficulty_random", "0.0", "0-Players can set their difficulty, #-Chance of difficulty", _, true, 0.0, true, 100.0);
+	ff2_fix_boss_skin=CreateConVar("ff2_fix_boss_skin", "1", "Make FF2 remove wearables in a new way(fixes certain buggy models having bad skin)? 0 - No, 1 - Yes", _, true, 0.0, true, 1.0);
 
 	//The following are used in various subplugins
 	CreateConVar("ff2_oldjump", "1", "Use old Saxton Hale jump equations", _, true, 0.0, true, 1.0);
@@ -7852,6 +7854,16 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 {
 	if(!Enabled)
 		return Plugin_Continue;
+	
+	if(IsBoss(client) && StrEqual(classname, "tf_wearable", false) && GetConVarBool(ff2_fix_boss_skin))
+	{
+		int boss_idx=GetBossIndex(client);
+		bool cosmetics = view_as<bool>(KvGetNum(BossKV[Special[boss_idx]], "cosmetics"));
+		if(!(FF2flags[client] & FF2FLAG_ALLOW_BOSS_WEARABLES) || !cosmetics)
+		{
+			return Plugin_Handled;
+		}
+	}
 
 	if(!ConfigWeapons)
 	{
