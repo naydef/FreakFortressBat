@@ -1049,7 +1049,7 @@ public void OnPluginStart()
 	rivalHUD = CreateHudSynchronizer();
 
 	char oldVersion[64];
-	cvarVersion.GetString(oldVersion, 64);
+	cvarVersion.GetString(oldVersion, sizeof(oldVersion));
 	if(strcmp(oldVersion, PLUGIN_VERSION, false))
 		LogToFile(eLog, "[Config] Warning: Your config may be outdated. Back up tf/cfg/sourcemod/FreakFortress2.cfg and delete it, and this plugin will generate a new one that you can then modify to your original values.");
 
