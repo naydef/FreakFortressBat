@@ -343,6 +343,7 @@ ConVar cvarRageDamage;
 ConVar cvarDifficulty;
 ConVar ff2_fix_boss_skin;
 ConVar ff2_backstab;
+ConVar ff2_attribute_manage;
 
 Handle FF2Cookies;
 Handle StatCookies;
@@ -832,6 +833,7 @@ public void OnPluginStart()
 	cvarDifficulty = CreateConVar("ff2_difficulty_random", "0.0", "0-Players can set their difficulty, #-Chance of difficulty", _, true, 0.0, true, 100.0);
 	ff2_fix_boss_skin=CreateConVar("ff2_fix_boss_skin", "1", "Make FF2 remove wearables in a new way(fixes certain buggy models having bad skin)? 0 - No, 1 - Yes", _, true, 0.0, true, 1.0);
 	ff2_backstab=CreateConVar("ff2_backstab", "1.0", "#-Damage ratio of backstabs. Note: values equal or less than 0 are forbidden", _, true, 0.01);
+	ff2_attribute_manage=CreateConVar("ff2_attribute_manage", "0", "0-FF2 will leave TF2x10 manage weapons, which have their attributes changed by FF2 1-FF2 will continue changing weapon attributes 2-Force disable weapon attribute changes(even when TF2x10 is absent)", _, true, 0.0, true, 1.0);
 
 	//The following are used in various subplugins
 	CreateConVar("ff2_oldjump", "1", "Use old Saxton Hale jump equations", _, true, 0.0, true, 1.0);
