@@ -122,7 +122,6 @@ last time or to encourage others to do the same.
 #define MapCFG "maps.cfg"
 #define SpawnTeleportCFG "spawn_teleport.cfg"
 #define SpawnTeleportBlacklistCFG "spawn_teleport_blacklist.cfg"
-#define WeaponCFG "weapons.cfg"
 
 #define LogPath "logs/freak_fortress_2"
 #define BossLogPath "logs/freak_fortress_2/bosses"
@@ -440,7 +439,6 @@ static bool executed = false;
 static bool executed2 = false;
 static bool ReloadFF2 = false;
 static bool ReloadWeapons = false;
-static bool ConfigWeapons = false;
 static bool ReloadConfigs = false;
 bool LoadCharset = false;
 static bool HasSwitched = false;
@@ -448,7 +446,6 @@ static bool HasSwitched = false;
 ConVar hostName;
 char oldName[256];
 int changeGamemode;
-Handle kvWeaponMods = INVALID_HANDLE;
 Handle kvDiffMods = INVALID_HANDLE;
 Handle SDKEquipWearable = null;
 
@@ -1899,7 +1896,6 @@ public void EnableFF2()
 	if(time > 1.0)
 		CreateTimer(time, Timer_Announce, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 
-	CacheWeapons();
 	CacheDifficulty();
 	CheckToChangeMapDoors();
 	CheckToTeleportToSpawn();
@@ -2021,37 +2017,6 @@ public void DisableFF2()
 		#endif
 	}
 	EnabledDesc = false;
-}
-
-public void CacheWeapons()
-{
-	if(cvarHardcodeWep.IntValue > 1)
-	{
-		ConfigWeapons = false;
-		return;
-	}
-
-	char config[PLATFORM_MAX_PATH];
-	BuildPath(Path_SM, config, sizeof(config), "%s/%s", DataPath, WeaponCFG);
-	if(!FileExists(config))
-	{
-		BuildPath(Path_SM, config, sizeof(config), "%s/%s", ConfigPath, WeaponCFG);
-		if(!FileExists(config))
-		{
-			LogToFile(eLog, "[Weapons] Could not find '%s'!", WeaponCFG);
-			ConfigWeapons = false;
-			return;
-		}
-	}
-
-	kvWeaponMods = CreateKeyValues("Weapons");
-	if(!FileToKeyValues(kvWeaponMods, config))
-	{
-		LogToFile(eLog, "[Weapons] '%s' is improperly formatted!", WeaponCFG);
-		ConfigWeapons = false;
-		return;
-	}
-	ConfigWeapons = true;
 }
 
 public void CacheDifficulty()
@@ -4285,7 +4250,6 @@ public void OnRoundEnd(Event event, const char[] name, bool dontBroadcast)
 
 	if(ReloadConfigs)
 	{
-		CacheWeapons();
 		CacheDifficulty();
 		CheckToChangeMapDoors();
 		CheckToTeleportToSpawn();
@@ -4305,7 +4269,6 @@ public void OnRoundEnd(Event event, const char[] name, bool dontBroadcast)
 
 	if(ReloadWeapons)
 	{
-		CacheWeapons();
 		ReloadWeapons = false;
 	}
 
@@ -8246,7 +8209,7 @@ public Action Timer_CheckItems(Handle timer, any userid)
 	static int civilianCheck[MAXTF2PLAYERS];
 
 	int weapon = GetPlayerWeaponSlot(client, 4);
-	if(IsValidEntity(weapon) && GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex")==60 && (kvWeaponMods == null || cvarHardcodeWep.IntValue>0))  //Cloak and Dagger
+	if(IsValidEntity(weapon) && GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex")==60)  //Cloak and Dagger
 	{
 		TF2_RemoveWeaponSlot(client, 4);
 		FF2_SpawnWeapon(client, "tf_weapon_invis", 60, 1, 0, "35 ; 1.65 ; 728 ; 1 ; 729 ; 0.65");
@@ -8266,59 +8229,7 @@ public Action Timer_CheckItems(Handle timer, any userid)
 	weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
 	if(IsValidEntity(weapon))
 	{
-		index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
-		if(index==402 && (kvWeaponMods==null || cvarHardcodeWep.IntValue>0))
-		{
-			TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
-			if(FF2_SpawnWeapon(client, "tf_weapon_sniperrifle", 402, 1, 6, "91 ; 0.5 ; 75 ; 3.75 ; 178 ; 0.8") == -1)
-				civilianCheck[client]++;
-		}
 
-		GetEntityClassname(weapon, classname, sizeof(classname));
-		if(kvWeaponMods!=null && ConfigWeapons)
-		{
-			for(int i=1; ; i++)
-			{
-				KvRewind(kvWeaponMods);
-				FormatEx(format, sizeof(format), "weapon%i", i);
-				if(KvJumpToKey(kvWeaponMods, format))
-				{
-					KvGetString(kvWeaponMods, "classname", format, sizeof(format));
-					KvGetString(kvWeaponMods, "index", wepIndexStr, sizeof(wepIndexStr));
-					slot = KvGetNum(kvWeaponMods, "slot", -1);
-					if(slot<0 || slot>2)
-						slot = 0;
-
-					if(StrContains(wepIndexStr, "-2")!=-1 && StrContains(classname, format, false)!=-1 || StrContains(wepIndexStr, "-1")!=-1 && StrEqual(classname, format, false))
-					{
-						CritBoosted[client][slot] = KvGetNum(kvWeaponMods, "crits", -1);
-						break;
-					}
-
-					if(StrContains(wepIndexStr, "-1")==-1 && StrContains(wepIndexStr, "-2")==-1)
-					{
-						weaponIdxcount = ExplodeString(wepIndexStr, " ; ", wepIndexes, sizeof(wepIndexes), 32);
-						for(wepIdx=0; wepIdx<=weaponIdxcount ; wepIdx++)
-						{
-							if(!wepIndexes[wepIdx][0])
-								continue;
-
-							wepIndex = StringToInt(wepIndexes[wepIdx]);
-							if(wepIndex != index)
-								continue;
-
-							CritBoosted[client][slot] = KvGetNum(kvWeaponMods, "crits", -1);
-							break;
-						}
-					}
-				}
-				else
-				{
-					break;
-				}
-			}
-			KvGoBack(kvWeaponMods);
-		}
 	}
 	else
 	{
@@ -8336,53 +8247,6 @@ public Action Timer_CheckItems(Handle timer, any userid)
 				SetEntityRenderColor(weapon, 255, 255, 255, 75);
 			}
 		}
-
-		index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
-		GetEntityClassname(weapon, classname, sizeof(classname));
-		if(kvWeaponMods!=null && ConfigWeapons)
-		{
-			for(int i=1; ; i++)
-			{
-				KvRewind(kvWeaponMods);
-				FormatEx(format, sizeof(format), "weapon%i", i);
-				if(KvJumpToKey(kvWeaponMods, format))
-				{
-					KvGetString(kvWeaponMods, "classname", format, sizeof(format));
-					KvGetString(kvWeaponMods, "index", wepIndexStr, sizeof(wepIndexStr));
-					slot = KvGetNum(kvWeaponMods, "slot", -1);
-					if(slot<0 || slot>2)
-						slot = 1;
-
-					if(StrContains(wepIndexStr, "-2")!=-1 && StrContains(classname, format, false)!=-1 || StrContains(wepIndexStr, "-1")!=-1 && StrEqual(classname, format, false))
-					{
-						CritBoosted[client][slot] = KvGetNum(kvWeaponMods, "crits", -1);
-						break;
-					}
-
-					if(StrContains(wepIndexStr, "-1")==-1 && StrContains(wepIndexStr, "-2")==-1)
-					{
-						weaponIdxcount = ExplodeString(wepIndexStr, " ; ", wepIndexes, sizeof(wepIndexes), 32);
-						for(wepIdx=0; wepIdx<=weaponIdxcount ; wepIdx++)
-						{
-							if(!wepIndexes[wepIdx][0])
-								continue;
-
-							wepIndex = StringToInt(wepIndexes[wepIdx]);
-							if(wepIndex != index)
-								continue;
-
-							CritBoosted[client][slot] = KvGetNum(kvWeaponMods, "crits", -1);
-							break;
-						}
-					}
-				}
-				else
-				{
-					break;
-				}
-			}
-			KvGoBack(kvWeaponMods);
-		}
 	}
 	else
 	{
@@ -8396,7 +8260,7 @@ public Action Timer_CheckItems(Handle timer, any userid)
 		FF2_SpawnWeapon(client, "tf_weapon_smg", 16, 1, 6, "149 ; 1.5 ; 15 ; 0.0 ; 1 ; 0.75");
 
 	#if defined _tf2attributes_included
-	if(tf2attributes && (kvWeaponMods == null || cvarHardcodeWep.IntValue>0))
+	if(tf2attributes)
 	{
 		if(IsValidEntity(FindPlayerBack(client, 444)))  //Mantreads
 		{
@@ -9167,7 +9031,6 @@ public Action Command_ReloadFF2Weapons(int client, int args)
 		return Plugin_Handled;
 	}
 	FReplyToCommand(client, "%s has been reloaded!", WeaponCFG);
-	CacheWeapons();
 	ReloadWeapons = false;
 	return Plugin_Handled;
 }
@@ -9186,7 +9049,6 @@ public Action Command_ReloadFF2Configs(int client, int args)
 		FReplyToCommand(client, "All configs are set to be reloaded!");
 		return Plugin_Handled;
 	}
-	CacheWeapons();
 	CacheDifficulty();
 	CheckToChangeMapDoors();
 	CheckToTeleportToSpawn();
@@ -12505,13 +12367,10 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 				{
 					case 61, 1006:  //Ambassador, Festive Ambassador
 					{
-						if(kvWeaponMods == null || cvarHardcodeWep.IntValue>0)
+						if(damagecustom == TF_CUSTOM_HEADSHOT)
 						{
-							if(damagecustom == TF_CUSTOM_HEADSHOT)
-							{
-								damage = 85.0;  //Final damage 255
-								return Plugin_Changed;
-							}
+							damage = 85.0;  //Final damage 255
+							return Plugin_Changed;
 						}
 					}
 					case 132, 266, 482, 1082:  //Eyelander, HHHH, Nessie's Nine Iron, Festive Eyelander
@@ -12520,13 +12379,10 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 					}
 					case 214:  //Powerjack
 					{
-						if(kvWeaponMods == null || cvarHardcodeWep.IntValue>0)
-						{
-							int health = GetClientHealth(attacker);
-							int newhealth = health+25;
-							if(newhealth <= GetEntProp(attacker, Prop_Data, "m_iMaxHealth"))  //No overheal allowed
-								SetEntityHealth(attacker, newhealth);
-						}
+						int health = GetClientHealth(attacker);
+						int newhealth = health+25;
+						if(newhealth <= GetEntProp(attacker, Prop_Data, "m_iMaxHealth"))  //No overheal allowed
+							SetEntityHealth(attacker, newhealth);
 					}
 					case 307:  //Ullapool Caber
 					{
@@ -12634,13 +12490,10 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 					}
 					case 310:  //Warrior's Spirit
 					{
-						if(kvWeaponMods == null || cvarHardcodeWep.IntValue>0)
-						{
-							int health = GetClientHealth(attacker);
-							int newhealth = health+50;
-							if(newhealth <= GetEntProp(attacker, Prop_Data, "m_iMaxHealth"))  //No overheal allowed
-								SetEntityHealth(attacker, newhealth);
-						}
+						int health = GetClientHealth(attacker);
+						int newhealth = health+50;
+						if(newhealth <= GetEntProp(attacker, Prop_Data, "m_iMaxHealth"))  //No overheal allowed
+							SetEntityHealth(attacker, newhealth);
 					}
 					case 317:  //Candycane
 					{
@@ -12648,34 +12501,28 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 					}
 					case 327:  //Claidheamh Mor
 					{
-						if(kvWeaponMods == null || cvarHardcodeWep.IntValue>0)
+						float charge=GetEntPropFloat(attacker, Prop_Send, "m_flChargeMeter");
+						if(charge+25.0 >= 100.0)
 						{
-							float charge=GetEntPropFloat(attacker, Prop_Send, "m_flChargeMeter");
-							if(charge+25.0 >= 100.0)
-							{
-								SetEntPropFloat(attacker, Prop_Send, "m_flChargeMeter", 100.0);
-							}
-							else
-							{
-								SetEntPropFloat(attacker, Prop_Send, "m_flChargeMeter", charge+25.0);
-							}
+							SetEntPropFloat(attacker, Prop_Send, "m_flChargeMeter", 100.0);
 						}
+						else
+						{
+							SetEntPropFloat(attacker, Prop_Send, "m_flChargeMeter", charge+25.0);
+						}
+
 					}
 					case 348:  //Sharpened Volcano Fragment
 					{
-						if(kvWeaponMods == null || cvarHardcodeWep.IntValue>0)
+						int health = GetClientHealth(attacker);
+						int max = GetEntProp(attacker, Prop_Data, "m_iMaxHealth");
+						int newhealth = health+5;
+						if(health < max+60)
 						{
-							int health = GetClientHealth(attacker);
-							int max = GetEntProp(attacker, Prop_Data, "m_iMaxHealth");
-							int newhealth = health+5;
-							if(health < max+60)
-							{
-								if(newhealth > max+60)
-									newhealth=max+60;
-
-								SetEntityHealth(attacker, newhealth);
-							}
+							if(newhealth > max+60)
+								newhealth=max+60;
 						}
+						SetEntityHealth(attacker, newhealth);
 					}
 					case 357:  //Half-Zatoichi
 					{
@@ -12820,13 +12667,10 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 					}
 					case 525, 595:  //Diamondback, Manmelter
 					{
-						if(kvWeaponMods == null || cvarHardcodeWep.IntValue>0)
+						if(GetEntProp(attacker, Prop_Send, "m_iRevengeCrits"))  //If a revenge crit was used, give a damage bonus
 						{
-							if(GetEntProp(attacker, Prop_Send, "m_iRevengeCrits"))  //If a revenge crit was used, give a damage bonus
-							{
-								damage = 85.0;  //255 final damage
-								return Plugin_Changed;
-							}
+							damage = 85.0;  //255 final damage
+							return Plugin_Changed;
 						}
 					}
 					case 528:  //Short Circuit
@@ -12874,13 +12718,10 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 					}
 					case 594:  //Phlogistinator
 					{
-						if(kvWeaponMods == null || cvarHardcodeWep.IntValue>0)
+						if(!TF2_IsPlayerInCondition(attacker, TFCond_CritMmmph))
 						{
-							if(!TF2_IsPlayerInCondition(attacker, TFCond_CritMmmph))
-							{
-								damage/=2.0;
-								return Plugin_Changed;
-							}
+							damage/=2.0;
+							return Plugin_Changed;
 						}
 					}
 				}
