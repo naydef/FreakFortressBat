@@ -465,6 +465,8 @@ int GoombaMode;
 int CapMode;
 bool TimerMode;
 
+StringMap ability_check_cache;
+
 enum Operators
 {
 	Operator_None = 0,	// None, for checking valid brackets
@@ -3887,6 +3889,8 @@ public void OnRoundEnd(Event event, const char[] name, bool dontBroadcast)
 		Enabled3 = false;
 		return;
 	}
+
+	ability_check_cache.Clear();
 
 	int team = event.GetInt("team");
 	if(cvarBossLog.IntValue>0 && cvarBossLog.IntValue<=playing2 && !CheatsUsed && !SpecialRound)
@@ -16919,18 +16923,29 @@ public int Native_GetRageDist(Handle plugin, int numParams)
 
 public int Native_HasAbility(Handle plugin, int numParams)
 {
-	static char pluginName[64], abilityName[64];
+	static char pluginName[64], abilityName[64], lookup_str[192];
 
 	int boss = GetNativeCell(1);
 	GetNativeString(2, pluginName, sizeof(pluginName));
 	GetNativeString(3, abilityName, sizeof(abilityName));
+	
+	FormatEx(lookup_str, sizeof(lookup_str), "%s-%s-%i", plugin_name, abilityName, boss);
+	bool res;
+	if(ability_check_cache.GetValue(lookup_str, res))
+	{
+		return res;
+	}
 	if(boss==-1 || boss>=MAXTF2PLAYERS || Special[boss]==-1 || !BossKV[Special[boss]])
+	{
+		ability_check_cache.SetValue(lookup_str, false);
 		return false;
+	}
 
 	KvRewind(BossKV[Special[boss]]);
 	if(!BossKV[Special[boss]])
 	{
 		LogToFile(eLog, "[Boss] Failed KV: %i %i", boss, Special[boss]);
+		ability_check_cache.SetValue(lookup_str, false);
 		return false;
 	}
 
@@ -16947,11 +16962,15 @@ public int Native_HasAbility(Handle plugin, int numParams)
 				static char pluginName2[64];
 				KvGetString(BossKV[Special[boss]], "plugin_name", pluginName2, sizeof(pluginName2));
 				if(!pluginName[0] || !pluginName2[0] || StrEqual(pluginName, pluginName2))  //Make sure the plugin names are equal
+				{
+					ability_check_cache.SetValue(lookup_str, true);
 					return true;
+				}
 			}
 			KvGoBack(BossKV[Special[boss]]);
 		}
 	}
+	ability_check_cache.SetValue(lookup_str, false);
 	return false;
 }
 
