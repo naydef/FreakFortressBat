@@ -1105,7 +1105,7 @@ public void OnPluginStart()
 
 	delete gameData;
 	
-	ability_check_cache=StringMap();
+	ability_check_cache=new StringMap();
 }
 
 public Action Command_SetRage(int client, int args)
