@@ -221,7 +221,6 @@ bool HealthBarMode;
 bool HealthBarModeC[MAXTF2PLAYERS];
 bool ShowHealthText;
 bool SpecialRound;
-int CritBoosted[MAXTF2PLAYERS][3];
 
 int timeleft;
 int cursongId[MAXTF2PLAYERS] = 1;
@@ -8217,11 +8216,6 @@ public Action Timer_CheckItems(Handle timer, any userid)
 		FF2_SpawnWeapon(client, "tf_weapon_invis", 60, 1, 0, "35 ; 1.65 ; 728 ; 1 ; 729 ; 0.65");
 	}
 
-	for(int i; i<3; i++)
-	{
-		CritBoosted[client][i] = -1;
-	}
-
 	if(bMedieval)
 		return Plugin_Continue;
 
@@ -9239,10 +9233,6 @@ public Action OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast)
 		return Plugin_Continue;
 
 	LastAliveClass[client] = TF2_GetPlayerClass(client);
-	for(int i; i<3; i++)
-	{
-		CritBoosted[client][i] = -1;
-	}
 	return Plugin_Continue;
 }
 
@@ -9662,117 +9652,69 @@ public Action ClientTimer(Handle timer)
 		}
 		else if(validwep && weapon==GetPlayerWeaponSlot(client, TFWeaponSlot_Melee))
 		{
-			switch(CritBoosted[client][2])
+			if(index==416 && cvarMarket.FloatValue)  //Market Gardener
 			{
-				case -1:
-				{
-					if(index==416 && cvarMarket.FloatValue)  //Market Gardener
-					{
-						addthecrit = FF2flags[client] & FF2FLAG_ROCKET_JUMPING ? true : false;
-					}
-					else if(index==44 || index==656 || !StrContains(classname, "tf_weapon_knife", false))  //Sandman, Holiday Punch, Knives
-					{
-						addthecrit = false;
-					}
-					else if(index == 307)	//Ullapool Caber
-					{
-						addthecrit = GetEntProp(weapon, Prop_Send, "m_iDetonated") ? false : true;
-					}
-					else
-					{
-						addthecrit = true;
-					}
-				}
-				case 1:
-				{
-						addthecrit = true;
-						if(cond == TFCond_HalloweenCritCandy)
-							cond = TFCond_Buffed;
-				}
-				case 2:
-				{
-					addthecrit = true;
-				}
+				addthecrit = FF2flags[client] & FF2FLAG_ROCKET_JUMPING ? true : false;
+			}
+			else if(index==44 || index==656 || !StrContains(classname, "tf_weapon_knife", false))  //Sandman, Holiday Punch, Knives
+			{
+				addthecrit = false;
+			}
+			else if(index == 307)	//Ullapool Caber
+			{
+				addthecrit = GetEntProp(weapon, Prop_Send, "m_iDetonated") ? false : true;
+			}
+			else
+			{
+				addthecrit = true;
 			}
 		}
 		else if(validwep && weapon==GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary))
 		{
-			switch(CritBoosted[client][1])
+			if(!StrContains(classname, "tf_weapon_smg"))  //SMGs
 			{
-				case -1:
-				{
-					if(!StrContains(classname, "tf_weapon_smg"))  //SMGs
-					{
-						if(index!=16 || !IsValidEntity(FindPlayerBack(client, 642)) || SniperClimbDelay<=0)	//Nerf Cozy Camper SMGs if Wall Climb is on
-						{
-							addthecrit = true;
-							if(cond == TFCond_HalloweenCritCandy)
-								cond = TFCond_Buffed;
-						}
-					}
-					else if(!StrContains(classname, "tf_weapon_cleaver") ||
-						!StrContains(classname, "tf_weapon_mechanical_arm") ||
-						!StrContains(classname, "tf_weapon_raygun"))  //Cleaver, Short Circuit, Righteous Bison
-					{
-						addthecrit = true;
-					}
-					else if(class==TFClass_Scout &&
-					       (!StrContains(classname, "tf_weapon_pistol") ||
-						!StrContains(classname, "tf_weapon_handgun_scout_secondary")))	//Scout Pistols
-					{
-						addthecrit = true;
-						if(cond == TFCond_HalloweenCritCandy)
-							cond = TFCond_Buffed;
-					}
-				}
-				case 1:
+				if(index!=16 || !IsValidEntity(FindPlayerBack(client, 642)) || SniperClimbDelay<=0)	//Nerf Cozy Camper SMGs if Wall Climb is on
 				{
 					addthecrit = true;
 					if(cond == TFCond_HalloweenCritCandy)
 						cond = TFCond_Buffed;
-				}
-				case 2:
-				{
-					addthecrit = true;
-				}
+						}
+			}
+			else if(!StrContains(classname, "tf_weapon_cleaver") ||
+				!StrContains(classname, "tf_weapon_mechanical_arm") ||
+				!StrContains(classname, "tf_weapon_raygun"))  //Cleaver, Short Circuit, Righteous Bison
+			{
+				addthecrit = true;
+			}
+			else if(class==TFClass_Scout &&
+			       (!StrContains(classname, "tf_weapon_pistol") ||
+				!StrContains(classname, "tf_weapon_handgun_scout_secondary")))	//Scout Pistols
+			{
+				addthecrit = true;
+				if(cond == TFCond_HalloweenCritCandy)
+					cond = TFCond_Buffed;
 			}
 		}
 		else if(validwep && weapon==GetPlayerWeaponSlot(client, TFWeaponSlot_Primary))
 		{
-			switch(CritBoosted[client][0])
+			if(!StrContains(classname, "tf_weapon_compound_bow"))  //Huntsmans
 			{
-				case -1:
-				{
-					if(!StrContains(classname, "tf_weapon_compound_bow"))  //Huntsmans
-					{
-						if(BowDamageNon <= 0)	//If non-crit boosted damage cvar is off
-						{
-							addthecrit = true;
-							if(cond==TFCond_HalloweenCritCandy && BowDamageMini>0)	//If mini-crit boosted damage cvar is on
-								cond = TFCond_Buffed;
-						}
-					}
-					else if(!StrContains(classname, "tf_weapon_revolver"))  //Revolver
-					{
-						addthecrit = true;
-						if(cond == TFCond_HalloweenCritCandy)
-							cond = TFCond_Buffed;
-					}
-					else if(!StrContains(classname, "tf_weapon_crossbow") || !StrContains(classname, "tf_weapon_drg_pomson"))  //Crusader's Crossbow, Pomson 6000
-					{
-						addthecrit = true;
-					}
-				}
-				case 1:
+				if(BowDamageNon <= 0)	//If non-crit boosted damage cvar is off
 				{
 					addthecrit = true;
-					if(cond == TFCond_HalloweenCritCandy)
+					if(cond==TFCond_HalloweenCritCandy && BowDamageMini>0)	//If mini-crit boosted damage cvar is on
 						cond = TFCond_Buffed;
 				}
-				case 2:
-				{
-					addthecrit = true;
-				}
+			}
+			else if(!StrContains(classname, "tf_weapon_revolver"))  //Revolver
+			{
+				addthecrit = true;
+				if(cond == TFCond_HalloweenCritCandy)
+					cond = TFCond_Buffed;
+			}
+			else if(!StrContains(classname, "tf_weapon_crossbow") || !StrContains(classname, "tf_weapon_drg_pomson"))  //Crusader's Crossbow, Pomson 6000
+			{
+				addthecrit = true;
 			}
 		}
 
@@ -9814,10 +9756,8 @@ public Action ClientTimer(Handle timer)
 			}
 			case TFClass_DemoMan:
 			{
-				if(CritBoosted[client][0]==-1 &&
-				   weapon==GetPlayerWeaponSlot(client, TFWeaponSlot_Primary) &&
-				  !IsValidEntity(GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)) &&
-				   shieldCrits)  //Demoshields
+				if( weapon==GetPlayerWeaponSlot(client, TFWeaponSlot_Primary) &&
+				  !IsValidEntity(GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)) && shieldCrits)  //Demoshields
 				{
 					addthecrit = true;
 					if(shieldCrits == 1)
@@ -13033,10 +12973,10 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 					return Plugin_Changed;
 				}
 
-				if((damagetype & DMG_CLUB) && CritBoosted[client][2]!=0 && CritBoosted[client][2]!=1 && (TF2_GetPlayerClass(attacker)!=TFClass_Spy || CritBoosted[client][2]>1))
+				if((damagetype & DMG_CLUB)&& (TF2_GetPlayerClass(attacker)!=TFClass_Spy))
 				{
 					int melee = GetIndexOfWeaponSlot(attacker, TFWeaponSlot_Melee);
-					if(CritBoosted[client][2]>1 || (melee!=416 && melee!=307 && melee!=44))
+					if((melee!=416 && melee!=307 && melee!=44))
 					{
 						damagetype |= DMG_CRIT|DMG_PREVENT_PHYSICS_FORCE;
 						return Plugin_Changed;
@@ -16752,6 +16692,10 @@ public int Native_GetRageDist(Handle plugin, int numParams)
 
 public int Native_HasAbility(Handle plugin, int numParams)
 {
+	if(!Enabled2)
+	{
+		return false;
+	}
 	static char pluginName[64], abilityName[64], lookup_str[192];
 
 	int boss = GetNativeCell(1);
