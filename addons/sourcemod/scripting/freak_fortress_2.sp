@@ -1104,6 +1104,8 @@ public void OnPluginStart()
 		LogToFile(eLog, "[Gamedata] Failed to create call: CBasePlayer::EquipWearable");
 
 	delete gameData;
+	
+	ability_check_cache=StringMap();
 }
 
 public Action Command_SetRage(int client, int args)
@@ -9018,20 +9020,6 @@ public Action Command_ReloadCharset(int client, int args)
 
 public Action Command_ReloadFF2Weapons(int client, int args)
 {
-	if(ReloadWeapons)
-	{
-		FReplyToCommand(client, "%s is no longer set to reload!", WeaponCFG);
-		ReloadWeapons = false;
-		return Plugin_Handled;
-	}
-	ReloadWeapons = true;
-	if(!CheckRoundState() || CheckRoundState()==1)
-	{
-		FReplyToCommand(client, "%s is set to reload!", WeaponCFG);
-		return Plugin_Handled;
-	}
-	FReplyToCommand(client, "%s has been reloaded!", WeaponCFG);
-	ReloadWeapons = false;
 	return Plugin_Handled;
 }
 
@@ -16770,7 +16758,7 @@ public int Native_HasAbility(Handle plugin, int numParams)
 	GetNativeString(2, pluginName, sizeof(pluginName));
 	GetNativeString(3, abilityName, sizeof(abilityName));
 	
-	FormatEx(lookup_str, sizeof(lookup_str), "%s-%s-%i", plugin_name, abilityName, boss);
+	FormatEx(lookup_str, sizeof(lookup_str), "%s-%s-%i", pluginName, abilityName, boss);
 	bool res;
 	if(ability_check_cache.GetValue(lookup_str, res))
 	{
