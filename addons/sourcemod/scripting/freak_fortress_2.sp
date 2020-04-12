@@ -16760,7 +16760,7 @@ public int Native_HasAbility(Handle plugin, int numParams)
 	
 	FormatEx(lookup_str, sizeof(lookup_str), "%s-%s-%i", pluginName, abilityName, boss);
 	bool res;
-	if(ability_check_cache.GetValue(lookup_str, res))
+	if(ability_check_cache.GetValue(lookup_str, res) && CheckRoundState()==1)
 	{
 		return res;
 	}
