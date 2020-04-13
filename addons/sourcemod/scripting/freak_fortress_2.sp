@@ -9686,12 +9686,11 @@ public Action ClientTimer(Handle timer)
 			{
 				addthecrit = true;
 			}
-			else if(class==TFClass_Scout &&
-			       (!StrContains(classname, "tf_weapon_pistol") ||
+			else if((!StrContains(classname, "tf_weapon_pistol") ||
 				!StrContains(classname, "tf_weapon_handgun_scout_secondary")))	//Scout Pistols
 			{
 				addthecrit = true;
-				if(cond == TFCond_HalloweenCritCandy)
+				if(class==TFClass_Scout && cond == TFCond_HalloweenCritCandy)
 					cond = TFCond_Buffed;
 			}
 		}
