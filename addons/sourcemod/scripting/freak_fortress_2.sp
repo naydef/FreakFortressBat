@@ -16708,6 +16708,10 @@ public int Native_HasAbility(Handle plugin, int numParams)
 	{
 		return res;
 	}
+	if(CheckRoundState()!=1)
+	{
+		ability_check_cache.Clear();
+	}
 	if(boss==-1 || boss>=MAXTF2PLAYERS || Special[boss]==-1 || !BossKV[Special[boss]])
 	{
 		ability_check_cache.SetValue(lookup_str, false);
