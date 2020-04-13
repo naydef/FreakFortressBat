@@ -269,7 +269,6 @@ ConVar cvarSniperClimbDelay;
 ConVar cvarStrangeWep;
 ConVar cvarQualityWep;
 ConVar cvarTripleWep;
-ConVar cvarHardcodeWep;
 ConVar cvarSelfKnockback;
 ConVar cvarFF2TogglePrefDelay;
 ConVar cvarNameChange;
@@ -759,7 +758,7 @@ public void OnPluginStart()
 	cvarStrangeWep = CreateConVar("ff2_strangewep", "1", "0-Disable Boss Weapon Stranges, 1-Enable Boss Weapon Stranges", _, true, 0.0, true, 1.0);
 	cvarQualityWep = CreateConVar("ff2_qualitywep", "5", "Default Boss Weapon Quality", _, true, 0.0, true, 15.0);
 	cvarTripleWep = CreateConVar("ff2_triplewep", "1", "0-Disable Boss Extra Triple Damage, 1-Enable Boss Extra Triple Damage", _, true, 0.0, true, 1.0);
-	cvarHardcodeWep = CreateConVar("ff2_hardcodewep", "1", "0-Only Use Config, 1-Use Alongside Hardcoded, 2-Only Use Hardcoded", _, true, 0.0, true, 2.0);
+	CreateConVar("ff2_hardcodewep", "1", "0-Only Use Config, 1-Use Alongside Hardcoded, 2-Only Use Hardcoded", _, true, 0.0, true, 2.0);
 	cvarSelfKnockback = CreateConVar("ff2_selfknockback", "0", "0-Disallow boss self knockback, 1-Allow boss self knockback, 2-Allow boss taking self damage too", _, true, 0.0, true, 2.0);
 	cvarFF2TogglePrefDelay = CreateConVar("ff2_boss_toggle_delay", "45.0", "Delay between joining the server and asking the player for their preference, if it is not set.");
 	cvarNameChange = CreateConVar("ff2_name_change", "0", "0-Disable, 1-Add the current boss to the server name, 2-Add the current charset to the server name", _, true, 0.0, true, 2.0);
@@ -8219,9 +8218,7 @@ public Action Timer_CheckItems(Handle timer, any userid)
 	if(bMedieval)
 		return Plugin_Continue;
 
-	int slot, index, wepIdx, wepIndex, weaponIdxcount;
-	char format[64];
-	static char classname[32], wepIndexStr[768], wepIndexes[768][32];
+	int index;
 	weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
 	if(IsValidEntity(weapon))
 	{
