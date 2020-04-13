@@ -8286,7 +8286,6 @@ public Action Timer_CheckItems(Handle timer, any userid)
 	if(IsValidEntity(weapon))
 	{
 		index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
-		GetEntityClassname(weapon, classname, sizeof(classname));
 		switch(index)
 		{
 		case 589:  //Eureka Effect
