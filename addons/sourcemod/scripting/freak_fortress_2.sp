@@ -5139,6 +5139,7 @@ void StopMusic(int client=0, bool permanent=false)
 			if(IsValidClient(client))
 			{
 				StopSound(client, SNDCHAN_AUTO, currentBGM[client]);
+				StopSound(client, SNDCHAN_AUTO, currentBGM[client]);
 				if(MusicTimer[client] != INVALID_HANDLE)
 				{
 					//PrintToConsoleAll("TERMINATING INPUT!");
