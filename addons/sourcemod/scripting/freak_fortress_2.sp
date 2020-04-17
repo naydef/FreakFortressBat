@@ -341,6 +341,7 @@ ConVar cvarDifficulty;
 ConVar ff2_fix_boss_skin;
 ConVar ff2_backstab;
 ConVar ff2_attribute_manage;
+ConVar ff2_enable_jump_weapons;
 
 Handle FF2Cookies;
 Handle StatCookies;
@@ -831,6 +832,7 @@ public void OnPluginStart()
 	ff2_fix_boss_skin=CreateConVar("ff2_fix_boss_skin", "1", "Make FF2 remove wearables in a new way(fixes certain buggy models having bad skin)? 0 - No, 1 - Yes", _, true, 0.0, true, 1.0);
 	ff2_backstab=CreateConVar("ff2_backstab", "1.0", "#-Damage ratio of backstabs. Note: values equal or less than 0 are forbidden", _, true, 0.01);
 	ff2_attribute_manage=CreateConVar("ff2_attribute_manage", "0", "0-FF2 will leave TF2x10 manage weapons, which have their attributes changed by FF2 1-FF2 will continue changing weapon attributes 2-Force disable weapon attribute changes(even when TF2x10 is absent)", _, true, 0.0, true, 1.0);
+	ff2_enable_jump_weapons==CreateConVar("ff2_enable_jump_weapons", "0", "0-Rocket and Sticky jumper are disabled 1-Enabled", _, true, 0.0, true, 1.0);
 
 	//The following are used in various subplugins
 	CreateConVar("ff2_oldjump", "1", "Use old Saxton Hale jump equations", _, true, 0.0, true, 1.0);
@@ -8296,6 +8298,25 @@ public Action Timer_CheckItems(Handle timer, any userid)
 					TF2_RemoveWeaponSlot(client, TFWeaponSlot_Melee);
 					FF2_SpawnWeapon(client, "tf_weapon_wrench", 7, 1, 0, "");
 				}
+			}
+		}
+		case 265:  //Stickybomb Jumper
+		{
+			if(!ff2_enable_jump_weapons.IntValue)
+			{
+				TF2_RemoveWeaponSlot(client, TFWeaponSlot_Secondary);
+				FF2_SpawnWeapon(client, "tf_weapon_pipebomblauncher", 20, 1, 0, "");
+				FF2_SetAmmo(client, weapon, 24);
+			}
+		}
+		case 237:  //Rocket Jumper
+		{
+			if(!ff2_enable_jump_weapons.IntValue)
+			{
+				TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
+				FF2_SpawnWeapon(client, "tf_weapon_rocketlauncher", 18, 1, 0, "114 ; 1");
+				//114: Mini-crits targets launched airborne by explosions, grapple hooks or enemy attacks
+				FF2_SetAmmo(client, weapon, 20);
 			}
 		}
 	}
