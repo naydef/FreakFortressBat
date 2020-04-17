@@ -342,6 +342,7 @@ ConVar ff2_fix_boss_skin;
 ConVar ff2_backstab;
 ConVar ff2_attribute_manage;
 ConVar ff2_enable_jump_weapons;
+ConVar ff2_bvb_health_modifier;
 
 Handle FF2Cookies;
 Handle StatCookies;
@@ -832,7 +833,8 @@ public void OnPluginStart()
 	ff2_fix_boss_skin=CreateConVar("ff2_fix_boss_skin", "1", "Make FF2 remove wearables in a new way(fixes certain buggy models having bad skin)? 0 - No, 1 - Yes", _, true, 0.0, true, 1.0);
 	ff2_backstab=CreateConVar("ff2_backstab", "1.0", "#-Damage ratio of backstabs. Note: values equal or less than 0 are forbidden", _, true, 0.01);
 	ff2_attribute_manage=CreateConVar("ff2_attribute_manage", "0", "0-FF2 will leave TF2x10 manage weapons, which have their attributes changed by FF2 1-FF2 will continue changing weapon attributes 2-Force disable weapon attribute changes(even when TF2x10 is absent)", _, true, 0.0, true, 1.0);
-	ff2_enable_jump_weapons==CreateConVar("ff2_enable_jump_weapons", "0", "0-Rocket and Sticky jumper are disabled 1-Enabled", _, true, 0.0, true, 1.0);
+	ff2_enable_jump_weapons=CreateConVar("ff2_enable_jump_weapons", "0", "0-Rocket and Sticky jumper are disabled 1-Enabled", _, true, 0.0, true, 1.0);
+	ff2_bvb_health_modifier=CreateConVar("ff2_bvb_health_modifier", "1.0", "Boss healths will be multiplied by this amount when BvB is active");
 
 	//The following are used in various subplugins
 	CreateConVar("ff2_oldjump", "1", "Use old Saxton Hale jump equations", _, true, 0.0, true, 1.0);
@@ -3657,6 +3659,10 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast)
 				}
 				if(BossHealthMax[boss]*BossLivesMax[boss] < 350)
 					BossHealthMax[boss] = RoundToFloor(350.0/BossLivesMax[boss]);
+				if(Enabled3)
+				{
+					BossHealthMax[boss] *= KvGetFloat(BossKV[Special[boss]], "bvb_health_modifer", ff2_bvb_health_modifier.FloatValue);
+				}
 
 				BossHealth[boss] = BossHealthMax[boss]*BossLivesMax[boss];
 				BossHealthLast[boss] = BossHealth[boss];
@@ -3671,6 +3677,10 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast)
 			if(IsValidClient(Boss[boss]) && IsPlayerAlive(Boss[boss]))
 			{
 				BossHealthMax[boss] = ParseFormula(boss, "health_formula", HealthFormula, RoundFloat(Pow((760.8+players)*(players-1.0), 1.0341)+2046.0));
+				if(Enabled3)
+				{
+					BossHealthMax[boss] *= KvGetFloat(BossKV[Special[boss]], "bvb_health_modifer", ff2_bvb_health_modifier.FloatValue);
+				}
 				BossHealth[boss] = BossHealthMax[boss]*BossLivesMax[boss];
 				BossHealthLast[boss] = BossHealth[boss];
 			}
@@ -7427,6 +7437,10 @@ public Action Timer_MakeBoss(Handle timer, any boss)
 		BossLivesMax[boss] = 1;
 	}
 	BossHealthMax[boss] = ParseFormula(boss, "health_formula", HealthFormula, RoundFloat(Pow((760.8+float(playing))*(float(playing)-1.0), 1.0341)+2046.0));
+	if(Enabled3)
+	{
+		BossHealthMax[boss] *= KvGetFloat(BossKV[Special[boss]], "bvb_health_modifer", ff2_bvb_health_modifier.FloatValue);
+	}
 	BossLives[boss] = BossLivesMax[boss];
 	BossHealth[boss] = BossHealthMax[boss]*BossLivesMax[boss];
 	BossHealthLast[boss] = BossHealth[boss];
