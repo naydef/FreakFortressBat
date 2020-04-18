@@ -12345,18 +12345,8 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 					{
 						if(!GetEntProp(weapon, Prop_Send, "m_iDetonated") && allowedDetonations<4)	// If using ullapool caber, only trigger if bomb hasn't been detonated
                         			{
-							if(TimesTen)
-							{
-								damage = ((Pow(float(BossHealthMax[boss]), 0.74074)-(Cabered[client]/128.0*float(BossHealthMax[boss])))/(3+(cvarTimesTen.FloatValue*allowedDetonations*3)))*bosses;
-							}
-							else if(cvarLowStab.BoolValue)
-							{
-								damage = ((Pow(float(BossHealthMax[boss]), 0.74074)+(2000.0/float(playing))+206.0-(Cabered[client]/128.0*float(BossHealthMax[boss])))/(3+(allowedDetonations*3)))*bosses;
-							}
-							else
-							{
-								damage = ((Pow(float(BossHealthMax[boss]), 0.74074)+512.0-(Cabered[client]/128.0*float(BossHealthMax[boss])))/(3+(allowedDetonations*3)))*bosses;
-							}
+							//damage = ((Pow(float(BossHealthMax[boss]), 0.74074)+512.0-(Cabered[client]/128.0*float(BossHealthMax[boss])))/(3+(allowedDetonations*3)))*bosses;
+							damage = 1200;
 							damagetype |= DMG_CRIT;
 
 							if(Cabered[client] < 5)
@@ -13043,6 +13033,8 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 						SetEntProp(weapon, Prop_Send, "m_bBroken", 0);
 						SetEntProp(weapon, Prop_Send, "m_iDetonated", 0);
 					}
+					damage = 1200;
+					return Plugin_Changed;
 				}
 			}
 
