@@ -5589,8 +5589,8 @@ public Action Command_SetMyBoss(int client, int args)
 				}
 			}
 			
-			int max_play_times=KvGetNum(BossKV[Special[boss]], "max_play_times_map", 0);
-			if(max_play_times && max_play_times<=KvGetNum(BossKV[Special[boss]], "internal_times_played", 0))
+			int max_play_times=KvGetNum(BossKV[config], "max_play_times_map", 0);
+			if(max_play_times && max_play_times<=KvGetNum(BossKV[config], "internal_times_played", 0))
 			{
 				FReplyToCommand(client, "%t", "deny_overplayed", max_play_times);
 				return Plugin_Handled;
