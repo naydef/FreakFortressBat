@@ -8313,24 +8313,24 @@ public Action Timer_CheckItems(Handle timer, any userid)
 					FF2_SpawnWeapon(client, "tf_weapon_wrench", 7, 1, 0, "");
 				}
 			}
-		}
 		case 265:  //Stickybomb Jumper
-		{
-			if(!ff2_enable_jump_weapons.IntValue)
 			{
-				TF2_RemoveWeaponSlot(client, TFWeaponSlot_Secondary);
-				FF2_SpawnWeapon(client, "tf_weapon_pipebomblauncher", 20, 1, 0, "");
-				FF2_SetAmmo(client, weapon, 24);
+				if(!ff2_enable_jump_weapons.IntValue)
+				{
+					TF2_RemoveWeaponSlot(client, TFWeaponSlot_Secondary);
+					FF2_SpawnWeapon(client, "tf_weapon_pipebomblauncher", 20, 1, 0, "");
+					FF2_SetAmmo(client, weapon, 24);
+				}
 			}
-		}
 		case 237:  //Rocket Jumper
-		{
-			if(!ff2_enable_jump_weapons.IntValue)
 			{
-				TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
-				FF2_SpawnWeapon(client, "tf_weapon_rocketlauncher", 18, 1, 0, "114 ; 1");
-				//114: Mini-crits targets launched airborne by explosions, grapple hooks or enemy attacks
-				FF2_SetAmmo(client, weapon, 20);
+				if(!ff2_enable_jump_weapons.IntValue)
+				{
+					TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
+					FF2_SpawnWeapon(client, "tf_weapon_rocketlauncher", 18, 1, 0, "114 ; 1");
+					//114: Mini-crits targets launched airborne by explosions, grapple hooks or enemy attacks
+					FF2_SetAmmo(client, weapon, 20);
+				}
 			}
 		}
 	}
