@@ -5588,6 +5588,13 @@ public Action Command_SetMyBoss(int client, int args)
 					}
 				}
 			}
+			
+			int max_play_times=KvGetNum(BossKV[Special[boss]], "max_play_times_map", 0);
+			if(max_play_times && max_play_times<=KvGetNum(BossKV[Special[boss]], "internal_times_played", 0))
+			{
+				FReplyToCommand(client, "%t", "deny_overplayed", max_play_times);
+				return Plugin_Handled;
+			}
 
 			if((KvGetNum(BossKV[config], "donator") && !CheckCommandAccess(client, "ff2_donator_bosses", ADMFLAG_RESERVATION, true)) ||
 			   (KvGetNum(BossKV[config], "admin") && !CheckCommandAccess(client, "ff2_admin_bosses", ADMFLAG_GENERIC, true)) ||
@@ -5817,9 +5824,11 @@ public Action Command_SetMyBoss(int client, int args)
 		KvGetString(BossKV[config], "name", boss, sizeof(boss));
 		GetBossSpecial(config, bossName, sizeof(bossName), client);
 		KvGetString(BossKV[config], "companion", companionName, sizeof(companionName));
+		int max_play_times=KvGetNum(BossKV[config], "max_play_times_map", 0);
 		if((KvGetNum(BossKV[config], "donator") && !CheckCommandAccess(client, "ff2_donator_bosses", ADMFLAG_RESERVATION, true)) ||
 		   (KvGetNum(BossKV[config], "admin") && !CheckCommandAccess(client, "ff2_admin_bosses", ADMFLAG_GENERIC, true)) ||
-		   (BossTheme(config) && !CheckCommandAccess(client, "ff2_theme_bosses", ADMFLAG_CONVARS, true)))
+		   (BossTheme(config) && !CheckCommandAccess(client, "ff2_theme_bosses", ADMFLAG_CONVARS, true)) ||
+		   (max_play_times && max_play_times<=KvGetNum(BossKV[config], "internal_times_played", 0)))
 		{
 			if(!KvGetNum(BossKV[config], "hidden"))
 				menu.AddItem(boss, bossName, ITEMDRAW_DISABLED);
@@ -14560,6 +14569,13 @@ public bool PickCharacter(int boss, int companion)
 				Special[boss] = -1;
 				continue;
 			}
+			int max_play_times=KvGetNum(BossKV[Special[boss]], "max_play_times_map", 0);
+			if(max_play_times && max_play_times<=KvGetNum(BossKV[Special[boss]], "internal_times_played", 0))
+			{
+				Special[boss] = -1;
+				continue;
+			}
+			KvSetNum(BossKV[Special[boss]], "internal_times_played", KvGetNum(BossKV[Special[boss]], "internal_times_played", 0)+1);
 			break;
 		}
 	}

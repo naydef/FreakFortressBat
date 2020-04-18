@@ -458,6 +458,11 @@
 		"en"		"Boss could not be found!"
 		"ru"		"Босс не найден!"
 	}
+	"deny_overplayed"
+	{
+		"#format"	"{1:i}"
+		"en"		"The maximum number of playing as this boss was reached for this map({1})!"
+	}
 	"FF2 Hud Menu Title"
 	{
 		"en"		"Configure HUD preferences"
