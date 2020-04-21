@@ -3661,7 +3661,7 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast)
 					BossHealthMax[boss] = RoundToFloor(350.0/BossLivesMax[boss]);
 				if(Enabled3)
 				{
-					BossHealthMax[boss] *= KvGetFloat(BossKV[Special[boss]], "bvb_health_modifer", ff2_bvb_health_modifier.FloatValue);
+					BossHealthMax[boss]=RoundFloat(float(KvGetFloat(BossKV[Special[boss]], "bvb_health_modifer", ff2_bvb_health_modifier.FloatValue))*BossHealthMax[boss]);
 				}
 
 				BossHealth[boss] = BossHealthMax[boss]*BossLivesMax[boss];
@@ -3679,7 +3679,7 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast)
 				BossHealthMax[boss] = ParseFormula(boss, "health_formula", HealthFormula, RoundFloat(Pow((760.8+players)*(players-1.0), 1.0341)+2046.0));
 				if(Enabled3)
 				{
-					BossHealthMax[boss] *= KvGetFloat(BossKV[Special[boss]], "bvb_health_modifer", ff2_bvb_health_modifier.FloatValue);
+					BossHealthMax[boss] = RoundFloat(KvGetFloat(BossKV[Special[boss]], "bvb_health_modifer", ff2_bvb_health_modifier.FloatValue)*float(BossHealthMax[boss]));
 				}
 				BossHealth[boss] = BossHealthMax[boss]*BossLivesMax[boss];
 				BossHealthLast[boss] = BossHealth[boss];
@@ -7448,7 +7448,7 @@ public Action Timer_MakeBoss(Handle timer, any boss)
 	BossHealthMax[boss] = ParseFormula(boss, "health_formula", HealthFormula, RoundFloat(Pow((760.8+float(playing))*(float(playing)-1.0), 1.0341)+2046.0));
 	if(Enabled3)
 	{
-		BossHealthMax[boss] *= KvGetFloat(BossKV[Special[boss]], "bvb_health_modifer", ff2_bvb_health_modifier.FloatValue);
+		BossHealthMax[boss] = RoundFloat(KvGetFloat(BossKV[Special[boss]], "bvb_health_modifer", ff2_bvb_health_modifier.FloatValue)*float(BossHealthMax[boss]));
 	}
 	BossLives[boss] = BossLivesMax[boss];
 	BossHealth[boss] = BossHealthMax[boss]*BossLivesMax[boss];
