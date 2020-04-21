@@ -3661,7 +3661,7 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast)
 					BossHealthMax[boss] = RoundToFloor(350.0/BossLivesMax[boss]);
 				if(Enabled3)
 				{
-					BossHealthMax[boss]=RoundFloat(float(KvGetFloat(BossKV[Special[boss]], "bvb_health_modifer", ff2_bvb_health_modifier.FloatValue))*BossHealthMax[boss]);
+					BossHealthMax[boss]=RoundFloat(KvGetFloat(BossKV[Special[boss]], "bvb_health_modifer", ff2_bvb_health_modifier.FloatValue)*float(BossHealthMax[boss]));
 				}
 
 				BossHealth[boss] = BossHealthMax[boss]*BossLivesMax[boss];
@@ -12346,7 +12346,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 						if(!GetEntProp(weapon, Prop_Send, "m_iDetonated") && allowedDetonations<4)	// If using ullapool caber, only trigger if bomb hasn't been detonated
                         			{
 							//damage = ((Pow(float(BossHealthMax[boss]), 0.74074)+512.0-(Cabered[client]/128.0*float(BossHealthMax[boss])))/(3+(allowedDetonations*3)))*bosses;
-							damage = 1200;
+							damage = 1200.0;
 							damagetype |= DMG_CRIT;
 
 							if(Cabered[client] < 5)
@@ -13033,7 +13033,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 						SetEntProp(weapon, Prop_Send, "m_bBroken", 0);
 						SetEntProp(weapon, Prop_Send, "m_iDetonated", 0);
 					}
-					damage = 1200;
+					damage = 1200.0;
 					return Plugin_Changed;
 				}
 			}
