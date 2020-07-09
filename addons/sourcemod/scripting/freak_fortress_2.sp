@@ -836,6 +836,7 @@ public void OnPluginStart()
 	ff2_enable_jump_weapons=CreateConVar("ff2_enable_jump_weapons", "0", "0-Rocket and Sticky jumper are disabled 1-Enabled", _, true, 0.0, true, 1.0);
 	ff2_bvb_health_modifier=CreateConVar("ff2_bvb_health_modifier", "1.0", "Boss healths will be multiplied by this amount when BvB is active");
 
+
 	//The following are used in various subplugins
 	CreateConVar("ff2_oldjump", "1", "Use old Saxton Hale jump equations", _, true, 0.0, true, 1.0);
 	CreateConVar("ff2_base_jumper_stun", "0", "Whether or not the Base Jumper should be disabled when a player gets stunned", _, true, 0.0, true, 1.0);
