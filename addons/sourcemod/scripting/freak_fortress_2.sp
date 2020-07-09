@@ -16753,8 +16753,8 @@ public int Native_DoAbility(Handle plugin, int numParams)
 	GetNativeString(3, ability_name, sizeof(ability_name));
 	int orig_boss_team = BossTeam;
 	BossTeam = GetClientTeam(Boss[GetNativeCell(1)]);
-	BossTeam = orig_boss_team;
 	UseAbility(ability_name, plugin_name, GetNativeCell(1), GetNativeCell(4), GetNativeCell(5));
+	BossTeam = orig_boss_team;
 }
 
 public int Native_GetAbilityArgument(Handle plugin, int numParams)
